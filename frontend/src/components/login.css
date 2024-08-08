@@ -103,10 +103,12 @@
         flex-direction: column;
     }
 
-    .Login-tagline {
+    .Login-tagline{
         position: static;
         transform: none;
         margin-bottom: 20px;
+        letter-spacing: .1em;
+        margin-top: 10px;
     }
 }
 
@@ -122,5 +124,8 @@
 
     .Login-tagline {
         font-size: 14px;
+        margin-left: 28px;
+        margin-right: 28px;
+        letter-spacing: .1em;
     }
 }

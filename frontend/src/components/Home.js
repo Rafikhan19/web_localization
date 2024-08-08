@@ -17,21 +17,12 @@ const Home = () => {
         e.preventDefault();
         setIframeUrl(url);
         extractAndTranslateText(url, language);
-        console.log("hii");
-        
     };
 
     const extractAndTranslateText = async (url, language) => {
-      console.log("jj");
-      
         try {
-            // Example API call to extract text
             const extractedText = await axios.post('http://localhost:3000/api/textextra/extract-text', { url, targetLanguage: language });
-            console.log(extractedText.data);
-            setTranslatedText(extractedText.data.text)
-          
-
-            
+            setTranslatedText(extractedText.data.text);
         } catch (error) {
             console.error('Error extracting or translating text:', error);
         }
@@ -81,7 +72,6 @@ const Home = () => {
             {translatedText && (
                 <div className="translated-text">
                     <h2>Translated Text:</h2>
-
                     <p>{translatedText}</p>
                 </div>
             )}
