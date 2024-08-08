@@ -1,32 +1,42 @@
 const express = require('express');
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
+
 const router = express.Router();
 
 router.post('/extract-text', async (req, res) => {
+    const { url } = req.body;
+    console.log(url);
+
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+    }
+
     try {
-        const { url, targetLanguage } = req.body;
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'], // Additional flags if needed
+        });
+        const page = await browser.newPage();
 
-        
-        if (!url || !targetLanguage) {
-            return res.status(400).json({ error: 'URL and target language are required' });
+        try {
+            await page.goto(url, {
+                waitUntil: 'networkidle2',
+                timeout: 60000, // Increased timeout to 60 seconds
+            });
+        } catch (error) {
+            console.error('Error navigating to the page:', error);
+            await browser.close();
+            return res.status(500).json({ error: 'Failed to load the page' });
         }
 
-        // Fetch the HTML of the page
-        const response = await axios.get(url);
-        const $ = cheerio.load(response.data);
-        const text=$('body').text();
-       
-        
+        const extractedText = await page.evaluate(() => document.body.innerText);
 
-        if (!text) {
-            return res.status(404).json({ error: 'No visible text found on the page' });
-        }
+        await browser.close();
 
-        res.json({ text });
+        res.json({ text: extractedText });
     } catch (error) {
-        console.error('Error processing request:', error);
-        res.status(500).send('Error processing request');
+        console.error('Error extracting text:', error);
+        res.status(500).json({ error: 'Failed to extract text' });
     }
 });
 

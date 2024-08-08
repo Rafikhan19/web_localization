@@ -6,25 +6,22 @@ const Home = () => {
     const [url, setUrl] = useState('');
     const [language, setLanguage] = useState('');
     const [iframeUrl, setIframeUrl] = useState('');
-    const [translatedText, setTranslatedText] = useState('');
+    const [extractedText, setExtractedText] = useState('');
 
     const languages = [
         'Hindi', 'Assamese', 'Bengali', 'Gujarati', 'Kannada', 'Malayalam', 
         'Marathi', 'Odia', 'Punjabi', 'Tamil', 'Telugu', 'English'
     ];
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
         setIframeUrl(url);
-        extractAndTranslateText(url, language);
-    };
 
-    const extractAndTranslateText = async (url, language) => {
         try {
-            const extractedText = await axios.post('http://localhost:3000/api/textextra/extract-text', { url, targetLanguage: language });
-            setTranslatedText(extractedText.data.text);
+            const response = await axios.post('http://localhost:3000/api/textextra/extract-text', { url });
+            setExtractedText(response.data.text);
         } catch (error) {
-            console.error('Error extracting or translating text:', error);
+            console.error('Error fetching extracted text:', error);
         }
     };
 
@@ -66,13 +63,13 @@ const Home = () => {
                     title="Website"
                     width="100%"
                     height="500px"
-                    style={{ border: 'none', marginTop: '20px' }}
+                    style={{ border: 'none', marginTop: '20px', width: '500px', height: '500px' }}
                 />
             )}
-            {translatedText && (
-                <div className="translated-text">
-                    <h2>Translated Text:</h2>
-                    <p>{translatedText}</p>
+            {extractedText && (
+                <div className="extracted-text">
+                    <h2>Extracted Text:</h2>
+                    <p>{extractedText}</p>
                 </div>
             )}
         </div>
